@@ -16,12 +16,13 @@ type RootStackParamList = {
     PediatricianMap: undefined;
     'Parental Guide': undefined; 
     'Lullabies & Stories': undefined;
-    'My Appointments': undefined; // Assuming 'AppointmentScreen' is registered as 'My Appointments'
+    'My Appointments': undefined; 
     MemoryBookScreen: undefined;
     SmartReminders: undefined;
     MilestoneScreen: undefined;
     BabyTracker: undefined;
     TelehealthConsultation: undefined;
+    SettingsScreen: undefined; // 👈 1. ADDED SettingsScreen
 };
 
 // Define the type for the navigation prop
@@ -47,7 +48,7 @@ const dashboardItems: DashboardItem[] = [
     { id: '4', title: 'Lullabies & Stories', description: 'Soothing sounds for your baby', icon: 'music', color: '#b99aff' },
     { id: '5', title: 'Pediatricians', description: 'Find nearby pediatricians', icon: 'stethoscope', color: '#97d5c9' },
     { id: '6', title: 'My Appointments', description: 'View and manage appointments', icon: 'calendar-alt', color: '#f79483' },
-    { id: '7', title: 'Feeding Tracker', description: 'Track feeding times and amounts', icon: 'utensils', color: '#a1c4fd' }, // Updated icon for better fit
+    { id: '7', title: 'Feeding Tracker', description: 'Track feeding times and amounts', icon: 'utensils', color: '#a1c4fd' },
     { id: '8', title: 'Clothing Guide', description: 'Seasonal outfits and size charts', icon: 'tshirt', color: '#c2e0f4' },
     { id: '9', title: 'Medication Tracker', description: 'Manage medicines with dosage schedules', icon: 'pills', color: '#ff9a9e' },
     { id: '10', title: 'Growth Tracker', description: 'Monitor height, weight, and BMI progress', icon: 'chart-line', color: '#4CAF50' },
@@ -55,7 +56,9 @@ const dashboardItems: DashboardItem[] = [
     { id: '12', title: 'Baby Tracker', description: 'Monitor your baby’s activities patterns', icon: 'bed', color: '#fbc2eb' },
     { id: '13', title: 'Telehealth Consultation ', description: 'Connect with pediatrician specialists', icon: 'video', color: '#a18cd1' },
     { id: '14', title: 'Smart Reminders', description: 'Reminders to help out the parents', icon: 'bell', color: '#667eea' },
-    { id: '15', title: 'Milestone Screen', description: 'Enhance the journey milestones of baby', icon: 'chart-bar', color: '#f7971e' },
+    { id: '15', 'title': 'Milestone Screen', description: 'Enhance the journey milestones of baby', icon: 'chart-bar', color: '#f7971e' },
+    { id: '16', title: 'Diaper Tracker', description: 'Track diaper changes and patterns', icon: 'baby', color: '#ffb347' },
+    { id: '17', title: 'Sleeping Tracker', description: 'Monitor sleep patterns and quality', icon: 'moon', color: '#89f7fe' },
 ];
 
 // --- 🌟 NEW HEADER COMPONENT ---
@@ -65,13 +68,33 @@ const CustomHeader: React.FC<{ navigation: DashboardScreenNavigationProp }> = ({
             <FontAwesome5 name="baby" size={20} color="#6a0dad" />
             <Text style={headerStyles.logoText}>Baby Care</Text>
         </View>
-        <TouchableOpacity 
-            style={headerStyles.profileIcon}
-            onPress={() => navigation.navigate('BabyProfile')}
-        >
-            {/* Using a general user/profile icon for the navigation button */}
-            <FontAwesome5 name="user-circle" size={24} color="#333" /> 
-        </TouchableOpacity>
+        
+        {/* 2. ADDED Icon Group to hold Settings and Profile */}
+        <View style={headerStyles.iconGroup}>
+            
+            {/* 3. SETTINGS ICON */}
+            <TouchableOpacity 
+                style={headerStyles.settingsIcon}
+                onPress={() => {
+                    // Navigate to the SettingsScreen
+                    navigation.navigate('SettingsScreen' as never);
+                    
+                    // Fallback/Testing Alert
+                    // Alert.alert("Settings", "Navigating to SettingsScreen...");
+                }}
+            >
+                {/* FontAwesome5 'gear' is the standard settings icon */}
+                <FontAwesome5 name="cog" size={24} color="#666" /> 
+            </TouchableOpacity>
+            
+            {/* PROFILE ICON */}
+            <TouchableOpacity 
+                style={headerStyles.profileIcon}
+                onPress={() => navigation.navigate('BabyProfile')}
+            >
+                <FontAwesome5 name="user-circle" size={24} color="#333" /> 
+            </TouchableOpacity>
+        </View>
     </View>
 );
 // --- END NEW HEADER COMPONENT ---
@@ -82,7 +105,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
         <TouchableOpacity 
             style={[styles.card, {borderColor: item.color}]} 
             onPress={() => {
-                // Navigate based on item ID
+                // Navigate based on item ID (Navigation logic retained)
                 switch (item.id) {
                     case '0':
                         navigation.navigate('BabyProfile');
@@ -115,22 +138,30 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
                         navigation.navigate('Lullabies & Stories' as never);
                         break;
                     case '6':
-                        navigation.navigate('AppointmentScreen' as never); // Navigate to My Appointments screen
+                        navigation.navigate('My Appointments' as never); 
                         break;
                     case '2':
-                        navigation.navigate('Memory Book' as never); 
+                        navigation.navigate('MemoryBookScreen' as never); 
                         break;
                     case '12':
-                        navigation.navigate('Baby Tracker' as never); 
+                        navigation.navigate('BabyTracker' as never); 
                         break;
                     case '13':
-                        navigation.navigate('Telehealth Consultation' as never); 
+                        navigation.navigate('TelehealthConsultation' as never); 
                         break;
                     case '14':
-                        navigation.navigate('Smart Reminders' as never); 
+                        navigation.navigate('SmartReminders' as never); 
                         break;
                     case '15':
                         navigation.navigate('MilestoneScreen' as never); 
+                        break;
+                    // NOTE: Need to register 'DiaperTrackerScreen' and 'SleepingTrackerScreen' 
+                    // in RootStackParamList if they exist. Using 'as never' for now.
+                    case '16':
+                        navigation.navigate('DiaperTrackerScreen' as never); 
+                        break;
+                    case '17':
+                        navigation.navigate('SleepingTrackerScreen' as never); 
                         break;
                     default:
                         Alert.alert(item.title, `You clicked on ${item.title}`);
@@ -149,7 +180,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
 
     return (
         <SafeAreaView style={styles.container}>
-            {/* 🌟 CUSTOM HEADER IMPLEMENTATION */}
+            {/* CUSTOM HEADER IMPLEMENTATION */}
             <CustomHeader navigation={navigation} /> 
             
             {/* Main Content Title */}
@@ -168,7 +199,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
     );
 };
 
-// --- 🌟 NEW HEADER STYLES ---
+// --- 🌟 UPDATED HEADER STYLES ---
 const headerStyles = StyleSheet.create({
     headerContainer: {
         flexDirection: 'row',
@@ -187,22 +218,30 @@ const headerStyles = StyleSheet.create({
     logoText: {
         fontSize: 18,
         fontWeight: 'bold',
-        color: '#6a0dad', // Baby Care color
+        color: '#6a0dad',
         marginLeft: 8,
+    },
+    // 4. NEW STYLES for Icon Group
+    iconGroup: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    settingsIcon: {
+        padding: 4,
+        marginRight: 10, // Space between settings and profile
     },
     profileIcon: {
         padding: 4,
     },
 });
-// --- END NEW HEADER STYLES ---
+// --- END UPDATED HEADER STYLES ---
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: Platform.OS === 'android' ? 0 : 0, // Removed extra padding as header handles it
+        paddingTop: Platform.OS === 'android' ? 0 : 0, 
         backgroundColor: '#fff',
     },
-    // Updated these styles to differentiate from the header
     contentTitle: { 
         fontSize: 24,
         fontWeight: 'bold',
@@ -210,14 +249,14 @@ const styles = StyleSheet.create({
         marginBottom: 5,
         marginHorizontal: 16,
         color: '#333',
-        textAlign: 'center', // Center text like the screenshot
+        textAlign: 'center',
     },
-    contentSubtitle: { // Updated these styles
+    contentSubtitle: {
         fontSize: 16,
         color: '#666',
         marginBottom: 20,
         marginHorizontal: 16,
-        textAlign: 'center', // Center text like the screenshot
+        textAlign: 'center',
     },
     listContainer: {
         paddingHorizontal: 8, 

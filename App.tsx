@@ -27,7 +27,9 @@ import BabyTrackerScreen from './src/screens/BabyTrackingScreen';
 import TelehealthConsultationScreen from './src/screens/TelehealthConsultationScreen';
 import AddReminderScreen from './src/screens/AddReminderScreen';
 import MilestoneScreen from './src/screens/MilestoneScreen';
-
+import DiaperTrackerScreen from './src/screens/DiaperTrackerScreen';
+import SleepingTrackerScreen from './src/screens/SleepingTrackerScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 const Stack = createStackNavigator();
 
 // ------------------------------------------------------------------
@@ -54,6 +56,10 @@ type RootStackParamList = {
     BabyTrackerScreen: undefined;
     TelehealthConsultationScreen: undefined;
     AddReminderScreen: undefined;
+    MilestoneScreen: undefined;
+    DiaperTrackerScreen: undefined;
+    SleepingTrackerScreen: undefined;
+    SettingsScreen: undefined;
 };
 
 // Define the required props for LoginScreen (The function to call on success)
@@ -109,7 +115,9 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isAuthenticated, isLoading, han
                     <Stack.Screen name="Telehealth Consultation" component={TelehealthConsultationScreen} options={{ title:'Telehealth Consultation' }} />
                     <Stack.Screen name="Smart Reminders" component={AddReminderScreen} options={{ title: 'Add Reminder' }} />
                     <Stack.Screen name="MilestoneScreen" component={MilestoneScreen} options={{ title: 'Baby Milestones' }} />
-
+                    <Stack.Screen name="DiaperTrackerScreen" component={DiaperTrackerScreen} options={{ title: 'Diaper Tracker' }} />
+                    <Stack.Screen name="SleepingTrackerScreen" component={SleepingTrackerScreen} options={{ title: 'Sleeping Tracker' }} />
+                    <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ title: 'Settings' }} />
                 </>
             ) : (
                 // --- Unauthenticated Screens (Public Routes) ---

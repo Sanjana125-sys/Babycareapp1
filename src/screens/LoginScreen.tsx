@@ -8,7 +8,8 @@ import {
     Button, 
     StyleSheet, 
     Alert,
-    TouchableOpacity 
+    TouchableOpacity,
+    Image // 👈 Image component imported
 } from 'react-native';
 import { StackScreenProps } from '@react-navigation/stack';
 import { ParamListBase } from '@react-navigation/native';
@@ -29,7 +30,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation, onAuthenticationS
     const handleLogin = () => {
         setIsLoading(true);
 
-        // --- NEW Simulated Login Logic ---
+        // --- Simulated Login Logic ---
         // 1. Check if both fields are non-empty
         if (email.trim() === '' || password.trim() === '') {
             setIsLoading(false);
@@ -37,30 +38,38 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation, onAuthenticationS
             return;
         }
 
-        // 2. Simulate successful API call delay (regardless of actual text entered)
-        //    In a real app, the API call would go here before calling onAuthenticationSuccess()
+        // 2. Simulate successful API call delay
         setTimeout(() => {
             setIsLoading(false);
             // SUCCESS: Call the function passed from App.tsx
-            // This redirects to the Dashboard.
             onAuthenticationSuccess(); 
         }, 1500);
-        
-        // --- END NEW Simulated Login Logic ---
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Welcome Back! 👶</Text>
+            
+            {/* 💡 IMAGE REPLACING TEXT */}
+            {/* Display a welcome message/placeholder text above the image */}
+            <Text style={styles.title}>Welcome Back!</Text>
+
+            <Image 
+                // !!! IMPORTANT: Replace the path below with the correct relative path 
+                // to your image file in your project assets (e.g., './assets/login-illustration.png')
+                source={require('../../assets/baby_parents.png')} 
+                style={styles.illustration}
+                resizeMode="contain"
+            />
+            {/* 💡 END IMAGE REPLACEMENT */}
 
             <TextInput
                 style={styles.input}
-                // Placeholder now reflects that any text will work
                 placeholder="Email Address" 
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                editable={!isLoading}
             />
             
             <TextInput
@@ -69,6 +78,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation, onAuthenticationS
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry
+                editable={!isLoading}
             />
 
             <View style={styles.buttonContainer}>
@@ -101,10 +111,19 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 28,
         fontWeight: 'bold',
-        marginBottom: 30,
+        marginBottom: 10,
         textAlign: 'center',
         color: '#333',
     },
+    // 💡 STYLES FOR IMAGE
+    illustration: {
+        width: '100%',
+        height: 200, // Fixed height for the image area
+        marginBottom: 30, // Space below the image before inputs
+        alignSelf: 'center',
+    },
+    // 💡 END STYLES
+
     input: {
         height: 50,
         borderColor: '#ccc',
