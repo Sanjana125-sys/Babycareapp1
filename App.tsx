@@ -30,6 +30,7 @@ import MilestoneScreen from './src/screens/MilestoneScreen';
 import DiaperTrackerScreen from './src/screens/DiaperTrackerScreen';
 import SleepingTrackerScreen from './src/screens/SleepingTrackerScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
+import ParentingTipsScreen from './src/screens/ParentingTipsScreen';
 const Stack = createStackNavigator();
 
 // ------------------------------------------------------------------
@@ -118,6 +119,9 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isAuthenticated, isLoading, han
                     <Stack.Screen name="DiaperTrackerScreen" component={DiaperTrackerScreen} options={{ title: 'Diaper Tracker' }} />
                     <Stack.Screen name="SleepingTrackerScreen" component={SleepingTrackerScreen} options={{ title: 'Sleeping Tracker' }} />
                     <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ title: 'Settings' }} />
+                    <Stack.Screen name="ParentingTipsScreen" component={ParentingTipsScreen} options={{ title: 'Parenting Tips' }} />
+
+
                 </>
             ) : (
                 // --- Unauthenticated Screens (Public Routes) ---

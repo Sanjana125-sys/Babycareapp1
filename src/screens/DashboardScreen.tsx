@@ -23,6 +23,7 @@ type RootStackParamList = {
     BabyTracker: undefined;
     TelehealthConsultation: undefined;
     SettingsScreen: undefined; // 👈 1. ADDED SettingsScreen
+    ParentingTipsScreen: undefined;
 };
 
 // Define the type for the navigation prop
@@ -59,6 +60,7 @@ const dashboardItems: DashboardItem[] = [
     { id: '15', 'title': 'Milestone Screen', description: 'Enhance the journey milestones of baby', icon: 'chart-bar', color: '#f7971e' },
     { id: '16', title: 'Diaper Tracker', description: 'Track diaper changes and patterns', icon: 'baby', color: '#ffb347' },
     { id: '17', title: 'Sleeping Tracker', description: 'Monitor sleep patterns and quality', icon: 'moon', color: '#89f7fe' },
+    { id: '18', title: 'Parenting Tips', description: 'Daily tips for new parents', icon: 'lightbulb', color: '#fbc2eb' },
 ];
 
 // --- 🌟 NEW HEADER COMPONENT ---
@@ -162,6 +164,9 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
                         break;
                     case '17':
                         navigation.navigate('SleepingTrackerScreen' as never); 
+                        break;
+                    case '18':
+                        navigation.navigate('ParentingTipsScreen' as never); 
                         break;
                     default:
                         Alert.alert(item.title, `You clicked on ${item.title}`);
