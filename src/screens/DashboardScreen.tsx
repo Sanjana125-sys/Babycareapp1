@@ -57,7 +57,7 @@ const dashboardItems: DashboardItem[] = [
     { id: '12', title: 'Baby Tracker', description: 'Monitor your baby’s activities patterns', icon: 'bed', color: '#fbc2eb' },
     { id: '13', title: 'Telehealth Consultation ', description: 'Connect with pediatrician specialists', icon: 'video', color: '#a18cd1' },
     { id: '14', title: 'Smart Reminders', description: 'Reminders to help out the parents', icon: 'bell', color: '#667eea' },
-    { id: '15', 'title': 'Milestone Screen', description: 'Enhance the journey milestones of baby', icon: 'chart-bar', color: '#f7971e' },
+    { id: '15', title: 'Milestone Screen', description: 'Enhance the journey milestones of baby', icon: 'chart-bar', color: '#f7971e' },
     { id: '16', title: 'Diaper Tracker', description: 'Track diaper changes and patterns', icon: 'baby', color: '#ffb347' },
     { id: '17', title: 'Sleeping Tracker', description: 'Monitor sleep patterns and quality', icon: 'moon', color: '#89f7fe' },
     { id: '18', title: 'Parenting Tips', description: 'Daily tips for new parents', icon: 'lightbulb', color: '#fbc2eb' },
@@ -143,16 +143,16 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
                         navigation.navigate('My Appointments' as never); 
                         break;
                     case '2':
-                        navigation.navigate('MemoryBookScreen' as never); 
+                        navigation.navigate('Memory Book' as never); 
                         break;
                     case '12':
-                        navigation.navigate('BabyTracker' as never); 
+                        navigation.navigate('Baby Tracker' as never); 
                         break;
                     case '13':
-                        navigation.navigate('TelehealthConsultation' as never); 
+                        navigation.navigate('Telehealth Consultation' as never); 
                         break;
                     case '14':
-                        navigation.navigate('SmartReminders' as never); 
+                        navigation.navigate('Smart Reminders' as never); 
                         break;
                     case '15':
                         navigation.navigate('MilestoneScreen' as never); 

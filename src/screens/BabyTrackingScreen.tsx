@@ -2,16 +2,17 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { 
-  View, 
-  Text, 
-  ScrollView, 
-  TouchableOpacity, 
-  Alert, 
-  StyleSheet 
+    View, 
+    Text, 
+    ScrollView, 
+    TouchableOpacity, 
+    Alert, 
+    StyleSheet,
+    Dimensions, // 💡 Import Dimensions for full-width calculation
 } from "react-native";
 import { ChevronLeft } from "lucide-react-native";
 import { useRouter } from "expo-router"; 
-import AsyncStorage from '@react-native-async-storage/async-storage'; // 💡 NEW
+import AsyncStorage from '@react-native-async-storage/async-storage'; 
 
 import { SleepLog, DiaperLog, ActivityLog, TrackingHistory } from "../../src/types"; 
 
@@ -22,75 +23,125 @@ import ActivityTab from "../components/ActivityTab";
 import ReportsTab from "../components/ReportsTab";
 import OverviewTab from "../components/OverviewTab";
 
+const { width } = Dimensions.get('window'); // Get screen width
 // --- Constants ---
 const STORAGE_KEY = '@BabyTracker:history';
+const TABS = ["Overview", "Sleep", "Diaper", "Activity", "Reports"];
 
 // --- Mock Initial Data & Helper Function ---
 const initialHistory: TrackingHistory = { 
-  sleep: [
-    {
-      id: "s1",
-      startTime: new Date(2025, 11, 2, 15, 6),
-      endTime: new Date(2025, 11, 2, 17, 10),
-      durationMinutes: 124, 
-      type: "Nap",
-      quality: "Good",
-      notes: "Slept soundly.",
-    },
-    {
-      id: "s2",
-      startTime: new Date(2025, 11, 1, 9, 30),
-      endTime: new Date(2025, 11, 1, 11, 30),
-      durationMinutes: 120, 
-      type: "Nap",
-      quality: "Excellent",
-      notes: "Morning nap.",
-    },
-  ],
-  diaper: [
-    {
-      id: "d1",
-      time: new Date(2025, 11, 2, 15, 6),
-      type: "Wet",
-      notes: "Just a regular wet diaper.",
-    },
-    {
-      id: "d2",
-      time: new Date(2025, 11, 2, 11, 0),
-      type: "Dirty",
-      notes: "A big one.",
-    },
-  ],
-  activity: [
-    {
-      id: "a1",
-      time: new Date(2025, 11, 2, 15, 6),
-      durationMinutes: 15,
-      type: "Tummy Time",
-      notes: "Managed 15 minutes before fussing.",
-    },
-    {
-      id: "a2",
-      time: new Date(2025, 11, 1, 14, 0),
-      durationMinutes: 30,
-      type: "Reading",
-      notes: "Read for half an hour.",
-    },
-  ],
+    sleep: [
+        {
+            id: "s1",
+            startTime: new Date(2025, 11, 2, 15, 6),
+            endTime: new Date(2025, 11, 2, 17, 10),
+            durationMinutes: 124, 
+            type: "Nap",
+            quality: "Good",
+            notes: "Slept soundly.",
+        },
+        {
+            id: "s2",
+            startTime: new Date(2025, 11, 1, 9, 30),
+            endTime: new Date(2025, 11, 1, 11, 30),
+            durationMinutes: 120, 
+            type: "Nap",
+            quality: "Excellent",
+            notes: "Morning nap.",
+        },
+    ],
+    diaper: [
+        {
+            id: "d1",
+            time: new Date(2025, 11, 2, 15, 6),
+            type: "Wet",
+            notes: "Just a regular wet diaper.",
+        },
+        {
+            id: "d2",
+            time: new Date(2025, 11, 2, 11, 0),
+            type: "Dirty",
+            notes: "A big one.",
+        },
+    ],
+    activity: [
+        {
+            id: "a1",
+            time: new Date(2025, 11, 2, 15, 6),
+            durationMinutes: 15,
+            type: "Tummy Time",
+            notes: "Managed 15 minutes before fussing.",
+        },
+        {
+            id: "a2",
+            time: new Date(2025, 11, 1, 14, 0),
+            durationMinutes: 30,
+            type: "Reading",
+            notes: "Read for half an hour.",
+        },
+    ],
 }; 
 const formatDuration = (minutes: number) /*: string*/ => { 
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    return `${h > 0 ? h + "h " : ""}${m}m`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${h > 0 ? h + "h " : ""}${m}m`;
 };
 
 
-export default function BabyTrackingScreen() {
-  const router = useRouter();
-  const [activeTab, setActiveTab] = useState("Overview"); 
-  const [history, setHistory] = useState<TrackingHistory>(initialHistory);
+// =========================================================
+// 💡 SEGMENTED TAB BAR COMPONENT (NEW)
+// =========================================================
 
-  const TABS = ["Overview", "Sleep", "Diaper", "Activity", "Reports"];
+interface SegmentedCategoryTabsProps {
+    tabs: string[];
+    activeTab: string;
+    setActiveTab: (tab: string) => void;
+}
+
+const SegmentedCategoryTabs: React.FC<SegmentedCategoryTabsProps> = ({ tabs, activeTab, setActiveTab }) => {
+    // Calculate equal width for each segment, assuming 16px horizontal padding on the wrapper
+    const segmentWidth = (width - 32) / tabs.length; 
+
+    return (
+        <View style={styles.segmentedTabsContainerWrapper}>
+            <View style={styles.segmentedTabsContainer}>
+                {tabs.map((tab) => {
+                    const isActive = tab === activeTab;
+                    
+                    return (
+                        <TouchableOpacity
+                            key={tab}
+                            style={[
+                                styles.segmentedTabButton,
+                                { width: segmentWidth },
+                                isActive ? styles.segmentedTabActive : styles.segmentedTabInactive
+                            ]}
+                            onPress={() => setActiveTab(tab)}
+                        >
+                            <Text 
+                                style={[
+                                    styles.segmentedTabText,
+                                    isActive ? styles.segmentedTextActive : styles.segmentedTextInactive
+                                ]}
+                            >
+                                {tab}
+                            </Text>
+                        </TouchableOpacity>
+                    );
+                })}
+            </View>
+        </View>
+    );
+};
+
+// =========================================================
+// 💡 MAIN COMPONENT (BabyTrackingScreen)
+// =========================================================
+
+export default function BabyTrackingScreen() {
+    const router = useRouter();
+    const [activeTab, setActiveTab] = useState("Overview"); 
+    const [history, setHistory] = useState<TrackingHistory>(initialHistory);
 
     // ---------------------------------------------
     // 💡 Persistence: Load data from AsyncStorage on component mount
@@ -129,21 +180,28 @@ export default function BabyTrackingScreen() {
     useEffect(() => {
         const saveHistory = async () => {
             try {
-                await AsyncStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+                // Ensure Date objects are converted back to strings for JSON storage
+                const historyToStore = JSON.stringify(history, (key, value) => {
+                    if (value instanceof Date) {
+                        return value.toISOString();
+                    }
+                    return value;
+                });
+                await AsyncStorage.setItem(STORAGE_KEY, historyToStore);
                 console.log("History saved successfully.");
             } catch (error) {
                 console.error("Error saving history:", error);
             }
         };
         
-        // Check to prevent saving initial placeholder data
+        // Save only if history has been initialized/modified
         if (history !== initialHistory) {
             saveHistory();
         }
     }, [history]); 
 
 
-  // --- LOGGING FUNCTIONS ---
+    // --- LOGGING FUNCTIONS ---
     const logSleep = (newLog: SleepLog) => {
         setHistory(prevHistory => {
             const updatedSleep = [newLog, ...prevHistory.sleep]; 
@@ -155,7 +213,7 @@ export default function BabyTrackingScreen() {
         });
     };
 
-  const logDiaper = useCallback((newLog: DiaperLog) => { 
+    const logDiaper = useCallback((newLog: DiaperLog) => { 
         setHistory(prevHistory => ({
             ...prevHistory,
             diaper: [newLog, ...prevHistory.diaper],
@@ -163,7 +221,7 @@ export default function BabyTrackingScreen() {
         Alert.alert("Success", `Logged Diaper: ${newLog.type}`);
     }, []);
 
-  const logActivity = useCallback((newLog: ActivityLog) => { 
+    const logActivity = useCallback((newLog: ActivityLog) => { 
         setHistory(prevHistory => ({
             ...prevHistory,
             activity: [newLog, ...prevHistory.activity],
@@ -172,176 +230,148 @@ export default function BabyTrackingScreen() {
     }, []);
 
 
-  // --- RENDERING LOGIC ---
-  const renderContent = useMemo(() => {
-    switch (activeTab) {
-      case "Overview":
-        return <OverviewTab history={history} formatDuration={formatDuration} />;
-      case "Sleep":
-        return <SleepTab sleepHistory={history.sleep} logSleep={logSleep} formatDuration={formatDuration} />;
-      case "Diaper":
-        return <DiaperTab diaperHistory={history.diaper} logDiaper={logDiaper} />;
-      case "Activity":
-        return <ActivityTab activityHistory={history.activity} logActivity={logActivity} formatDuration={formatDuration} />;
-      case "Reports":
-        // Passing the full history object to the ReportsTab
-        return <ReportsTab history={history} formatDuration={formatDuration} />;
-      default:
-        return <OverviewTab history={history} formatDuration={formatDuration} />;
-        
-    }
-  }, [activeTab, history, logSleep, logDiaper, logActivity]);
+    // --- RENDERING LOGIC ---
+    const renderContent = useMemo(() => {
+        switch (activeTab) {
+            case "Overview":
+                return <OverviewTab history={history} formatDuration={formatDuration} />;
+            case "Sleep":
+                return <SleepTab sleepHistory={history.sleep} logSleep={logSleep} formatDuration={formatDuration} />;
+            case "Diaper":
+                return <DiaperTab diaperHistory={history.diaper} logDiaper={logDiaper} />;
+            case "Activity":
+                return <ActivityTab activityHistory={history.activity} logActivity={logActivity} formatDuration={formatDuration} />;
+            case "Reports":
+                return <ReportsTab history={history} formatDuration={formatDuration} />;
+            default:
+                return <OverviewTab history={history} formatDuration={formatDuration} />;
+                
+        }
+    }, [activeTab, history, logSleep, logDiaper, logActivity]);
 
-  return (
-    // Replaced className="flex-1 bg-gray-50" with style={styles.container}
-    <View style={styles.container}>
-      
-      {/* Header */}
-      {/* Replaced className="..." with style={styles.header} */}
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-            <ChevronLeft size={24} color="#374151" />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>
-            Baby Tracking
-          </Text>
-        </View>
+    return (
+        <View style={styles.container}>
+            
+            {/* Header */}
+            <View style={styles.header}>
+                <View style={styles.headerRow}>
+                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
+                        <ChevronLeft size={24} color="#374151" />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>
+                        Baby Tracking
+                    </Text>
+                </View>
+            </View>
 
-        {/* Tab Navigation */}
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          style={styles.tabContainer}
-        >
-          {TABS.map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              onPress={() => setActiveTab(tab)}
-              style={[
-                styles.tabButton,
-                activeTab === tab ? styles.tabButtonActive : styles.tabButtonInactive
-              ]}
-            >
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === tab ? styles.tabTextActive : styles.tabTextInactive
-                ]}
-              >
-                {tab}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-      </View>
+            {/* Segmented Tab Navigation: Replaced the ScrollView here */}
+            <SegmentedCategoryTabs
+                tabs={TABS}
+                activeTab={activeTab}
+                setActiveTab={setActiveTab}
+            />
 
-      {/* Main Content Area */}
-      {/* Replaced className="flex-1 pt-4" with style={styles.contentArea} */}
-      <ScrollView style={styles.contentArea}>
-        {renderContent}
-      </ScrollView>
-    </View>
-  );
+            {/* Main Content Area */}
+            <ScrollView style={styles.contentArea} showsVerticalScrollIndicator={false}>
+                {renderContent}
+            </ScrollView>
+        </View>
+    );
 }
 
 
-// --- StyleSheet Definitions ---
+// =========================================================
+// 💡 MODIFIED STYLESHEET DEFINITIONS (for Segmented Tabs)
+// =========================================================
+
 const styles = StyleSheet.create({
-  // Equivalent to: flex-1 bg-gray-50
-  container: {
-    flex: 1,
-    backgroundColor: '#f9fafb', // gray-50
-  },
+    // Equivalent to: flex-1 bg-gray-50
+    container: {
+        flex: 1,
+        backgroundColor: '#f9fafb', // gray-50
+    },
 
-  // Equivalent to: bg-white pt-12 pb-2 px-4 border-b border-gray-200 shadow-sm
-  header: {
-    backgroundColor: 'white',
-    paddingTop: 48, // pt-12 (assuming standard Expo safe area offset)
-    paddingBottom: 8, // pb-2
-    paddingHorizontal: 16, // px-4
-    borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb', // gray-200
-    shadowColor: '#000', // shadow-sm equivalent
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
-    elevation: 2, // Android shadow
-  },
+    // Equivalent to: bg-white pt-12 pb-2 px-4 border-b border-gray-200 shadow-sm
+    header: {
+        backgroundColor: 'white',
+        paddingTop: 48, // pt-12 (assuming standard Expo safe area offset)
+        paddingBottom: 8, // pb-2
+        paddingHorizontal: 16, // px-4
+        // The shadow and border are now primarily for the header content above the tabs
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb', // gray-200
+        shadowColor: '#000', // shadow-sm equivalent
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.1,
+        shadowRadius: 1,
+        elevation: 2, // Android shadow
+    },
 
-  // Equivalent to: flex-row items-center
-  headerRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
+    // Equivalent to: flex-row items-center
+    headerRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
 
-  // Equivalent to: mr-3 p-2
-  backButton: {
-    marginRight: 12, // mr-3
-    padding: 8, // p-2
-  },
+    // Equivalent to: mr-3 p-2
+    backButton: {
+        marginRight: 12, // mr-3
+        padding: 8, // p-2
+    },
 
-  // Equivalent to: text-gray-900 text-xl font-bold
-  headerTitle: {
-    color: '#111827', // gray-900
-    fontSize: 20, // text-xl
-    fontWeight: '700', // font-bold
-  },
+    // Equivalent to: text-gray-900 text-xl font-bold
+    headerTitle: {
+        color: '#111827', // gray-900
+        fontSize: 20, // text-xl
+        fontWeight: '700', // font-bold
+    },
 
-  // Equivalent to: mt-3 flex-row
-  tabContainer: {
-    marginTop: 12, // mt-3
-    flexDirection: 'row',
-  },
-
-  // Common styles for both active and inactive tabs
-  tabButton: {
-    paddingVertical: 8, // py-2
-    paddingHorizontal: 16, // px-4
-    borderRadius: 9999, // rounded-full
-    marginRight: 8, // mr-2
-    minWidth: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-
-  // Equivalent to: bg-teal-500 shadow-sm
-  tabButtonActive: {
-    backgroundColor: '#14b8a6', // teal-500
-    shadowColor: '#14b8a6',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
-    elevation: 3,
-    borderWidth: 0,
-  },
-
-  // Equivalent to: bg-white border border-gray-200
-  tabButtonInactive: {
-    backgroundColor: 'white',
-    borderWidth: 1,
-    borderColor: '#e5e7eb', // gray-200
-  },
-  
-  // Common text style
-  tabText: {
-    fontSize: 14, // text-sm
-    fontWeight: '500', // font-medium
-  },
-
-  // Equivalent to: text-white
-  tabTextActive: {
-    color: 'white',
-  },
-
-  // Equivalent to: text-gray-600
-  tabTextInactive: {
-    color: '#4b5563', // gray-600
-  },
-  
-  // Equivalent to: flex-1 pt-4
-  contentArea: {
-    flex: 1,
-    paddingTop: 16, // pt-4
-  },
+    // --- NEW SEGMENTED TAB BAR STYLES ---
+    segmentedTabsContainerWrapper: {
+        backgroundColor: 'white', // Background of the area holding the tabs
+        paddingHorizontal: 16, // Padding around the segmented bar
+        paddingVertical: 10,
+        // Optional: Add shadow/border here if desired, but we keep it clean for this style
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e7eb',
+    },
+    segmentedTabsContainer: {
+        flexDirection: 'row',
+        backgroundColor: '#374151', // Dark blue/gray background for the tab bar itself (The "inactive" color)
+        borderRadius: 8,
+        overflow: 'hidden',
+        height: 44,
+        alignSelf: 'stretch', 
+    },
+    segmentedTabButton: {
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    segmentedTabActive: {
+        backgroundColor: 'white', // White background for the active segment
+        borderRadius: 8, // Rounded corners inside the container
+        margin: 4, // Creates a 4px border (the dark background showing through)
+        flex: 1,
+    },
+    segmentedTabInactive: {
+        backgroundColor: 'transparent',
+        flex: 1,
+    },
+    segmentedTabText: {
+        fontSize: 14,
+        fontWeight: '600',
+    },
+    segmentedTextActive: {
+        color: '#1F2937', // Dark text for active tab
+    },
+    segmentedTextInactive: {
+        color: '#9CA3AF', // Light/Gray text for inactive tab
+    },
+    
+    // Equivalent to: flex-1 pt-4
+    contentArea: {
+        flex: 1,
+        paddingTop: 16, // pt-4
+    },
+    // The old styles like tabContainer, tabButton, tabText are no longer used and removed from the component.
 });

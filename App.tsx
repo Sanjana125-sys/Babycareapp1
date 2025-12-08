@@ -109,7 +109,7 @@ const AuthScreen: React.FC<AuthScreenProps> = ({ isAuthenticated, isLoading, han
                     <Stack.Screen name="PediatricianMap" component={PediatricianMapScreen} options={{ title: 'Pediatricians' }} />
                     <Stack.Screen name="Parental Guide" component={ParentalGuideScreen} options={{ title: 'Parental Guide' }} />
                     <Stack.Screen name="Lullabies & Stories" component={LullabiesAndStoriesScreen} options={{ title: 'Lullabies & Stories' }} />
-                    <Stack.Screen name="AppointmentScreen" component={AppointmentScreen} options={{ title: 'My Appointments' }} />
+                    <Stack.Screen name="My Appointments" component={AppointmentScreen} options={{ title: 'My Appointments' }} />
                     <Stack.Screen name="Signup" component={SignupScreen} options={{ title: 'Sign Up' }} />
                     <Stack.Screen name="Memory Book" component={MemoryBookScreen} options={{ title:'Memory Book' }} />
                     <Stack.Screen name="Baby Tracker" component={BabyTrackerScreen} options={{ title:'Baby Tracker' }} />
