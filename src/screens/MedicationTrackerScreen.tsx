@@ -489,19 +489,7 @@ const MedicationTrackerScreen: React.FC = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             {/* Header Bar */}
-            <View style={trackerStyles.headerBar}>
-                <TouchableOpacity onPress={() => console.log('Go Back')}>
-                    <Icon name="ArrowLeft" size={24} style={trackerStyles.headerIcon} />
-                </TouchableOpacity>
-                <View>
-                    <Text style={trackerStyles.headerTitle}>Medication Tracker</Text>
-                    <Text style={trackerStyles.headerSubtitle}>Manage your baby's medications</Text>
-                </View>
-                <TouchableOpacity>
-                    <Icon name="Link" size={24} style={trackerStyles.headerIcon} />
-                </TouchableOpacity>
-            </View>
-
+            
             {/* Baby Dropdown & Tabs */}
             <View style={trackerStyles.tabContainerWrapper}>
                 {/* 💡 MODIFIED: Use the new BabyDropdownSelector */}

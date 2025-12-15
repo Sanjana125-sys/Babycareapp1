@@ -253,16 +253,7 @@ export default function BabyTrackingScreen() {
         <View style={styles.container}>
             
             {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.headerRow}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-                        <ChevronLeft size={24} color="#374151" />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>
-                        Baby Tracking
-                    </Text>
-                </View>
-            </View>
+            
 
             {/* Segmented Tab Navigation: Replaced the ScrollView here */}
             <SegmentedCategoryTabs

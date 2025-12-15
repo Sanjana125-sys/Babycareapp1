@@ -315,16 +315,7 @@ const SleepingTrackerScreen = () => {
 
     return (
         <View style={styles.flex1}>
-            {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.headerRow}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.p1}>
-                        <Text style={styles.backButtonText}>Back</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.screenTitle}>Sleeping Tracker</Text>
-                    <View style={styles.spacer} />
-                </View>
-            </View>
+            
 
             <ScrollView style={styles.scrollViewContent}>
                 {/* Stats Summary */}

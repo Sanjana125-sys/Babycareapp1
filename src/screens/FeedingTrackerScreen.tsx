@@ -371,22 +371,7 @@ const FeedingTrackerScreen: React.FC<Props> = ({ navigation }) => {
     return (
         <View style={styles.container}>
             {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <TouchableOpacity 
-                        onPress={() => navigation.goBack()}
-                        style={{ flexDirection: 'row', alignItems: 'center' }}
-                    >
-                        <ChevronLeft color="white" size={24} /> 
-                        <Text style={styles.backButtonText}>Back</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Feeding Tracker</Text>
-                    <TouchableOpacity onPress={() => Alert.alert("Navigate", "Navigating to Profile")}>
-                        <Baby color="white" size={24} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-
+            
             {/* Tabs */}
             <View style={styles.tabsContainer}>
                 <TouchableOpacity

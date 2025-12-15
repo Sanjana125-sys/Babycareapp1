@@ -1,5 +1,3 @@
-// components/DiaperTab.tsx
-
 import React, { useState } from "react";
 import { 
   View, 
@@ -11,15 +9,22 @@ import {
   Alert
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Droplet, Calendar, CheckCircle } from "lucide-react-native";
+import { 
+  Droplet, 
+  Calendar, 
+  CheckCircle,
+  // New Icons for Diaper Type
+  Droplets, // Represents 'Both' (two droplets)
+  Package,  // Represents 'Dirty' (solid)
+} from "lucide-react-native";
 // import { DiaperLog } from "../../src/types"; // Commented out to define type locally
 
 // --- DiaperLog Type Definition (Ensure this matches your src/types.ts) ---
 interface DiaperLog {
-    id: string;
-    time: Date;
-    type: "Wet" | "Dirty" | "Both"; // Changed from "Mixed" to "Both" based on DIAPER_TYPES array
-    notes: string;
+    id: string;
+    time: Date;
+    type: "Wet" | "Dirty" | "Both"; // Changed from "Mixed" to "Both" based on DIAPER_TYPES array
+    notes: string;
 }
 // -------------------------------------------------------------------------
 
@@ -59,13 +64,40 @@ export default function DiaperTab({ diaperHistory, logDiaper }: DiaperTabProps) 
     setNotes("");
   };
 
-  // Helper function for the DateTimePicker change event
-  const onTimeChange = (event: any, selectedDate?: Date) => {
-    setShowPicker(false);
-    if (selectedDate) {
-      setTime(selectedDate);
-    }
-  };
+  // Helper function for the DateTimePicker change event
+  const onTimeChange = (event: any, selectedDate?: Date) => {
+    setShowPicker(false);
+    if (selectedDate) {
+      setTime(selectedDate);
+    }
+  };
+
+  // Helper function for date formatting (consistent with is24Hour=true)
+  const formatDateTime = (date: Date) => {
+    return date.toLocaleString("en-US", { 
+      month: '2-digit', 
+      day: '2-digit', 
+      year: 'numeric', 
+      hour: '2-digit', 
+      minute: '2-digit', 
+      hour12: false // Force 24-hour format (e.g., 23:00)
+    });
+  };
+
+  // --- NEW HELPER FUNCTION FOR ICONS ---
+  const getDiaperIcon = (type: DiaperLog["type"], size = 16) => {
+    switch (type) {
+      case "Wet":
+        return <Droplet size={size} color="#3B82F6" />; // Blue
+      case "Dirty":
+        return <Package size={size} color="#F59E0B" />; // Amber/Brownish
+      case "Both":
+        return <Droplets size={size} color="#10B981" />; // Green/Teal
+      default:
+        return null;
+    }
+  };
+
 
   return (
     <View style={styles.container}>
@@ -85,8 +117,7 @@ export default function DiaperTab({ diaperHistory, logDiaper }: DiaperTabProps) 
         >
           <Calendar size={18} color="#9CA3AF" />
           <Text style={styles.timeInputText}>
-                {/* Formatting the Date object for display */}
-                {time.toLocaleString("en-US", { month: '2-digit', day: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false })}
+                {formatDateTime(time)}
           </Text>
         </TouchableOpacity>
 
@@ -94,9 +125,10 @@ export default function DiaperTab({ diaperHistory, logDiaper }: DiaperTabProps) 
         <View style={styles.typeDropdownWrapper}>
           <Text style={styles.label}>Type</Text>
           <TouchableOpacity 
-            style={styles.dropdownButton}
+            style={[styles.dropdownButton, styles.dropdownWithIcon]}
             onPress={() => setShowTypeDropdown(!showTypeDropdown)}
           >
+            {getDiaperIcon(type, 18)}
             <Text style={styles.dropdownText}>{type}</Text>
           </TouchableOpacity>
           {showTypeDropdown && (
@@ -110,6 +142,7 @@ export default function DiaperTab({ diaperHistory, logDiaper }: DiaperTabProps) 
                   ]}
                   onPress={() => { setType(item as DiaperLog["type"]); setShowTypeDropdown(false); }}
                 >
+                  {getDiaperIcon(item as DiaperLog["type"], 16)}
                   <Text style={styles.dropdownText}>{item}</Text>
                   {type === item && <CheckCircle size={16} color="#06B6D4" />}
                 </TouchableOpacity>
@@ -153,10 +186,13 @@ export default function DiaperTab({ diaperHistory, logDiaper }: DiaperTabProps) 
         <ScrollView style={styles.historyScroll}>
           {diaperHistory.map((log) => (
             <View key={log.id} style={styles.historyItem}>
-              <Text style={styles.historyItemType}>
-                {log.type}
-              </Text>
-              <Text style={styles.historyItemTime}>
+              <View style={styles.historyItemHeader}>
+                {getDiaperIcon(log.type, 18)}
+                <Text style={[styles.historyItemType, { marginLeft: 8 }]}>
+                  {log.type}
+                </Text>
+              </View>
+              <Text style={[styles.historyItemTime, { marginLeft: 26 }]}>
                 {log.time.toLocaleDateString()} {log.time.toLocaleTimeString()}
               </Text>
             </View>
@@ -249,8 +285,13 @@ const styles = StyleSheet.create({
     padding: 12, // p-3
     backgroundColor: 'white',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+  },
+
+  // NEW: Style for dropdown when an icon is present (changed from space-between)
+  dropdownWithIcon: {
+    justifyContent: 'flex-start',
+    gap: 8, // Use gap for spacing (requires RN > 0.71, adjust with margin if older)
   },
 
   // Dropdown Menu: absolute top-full w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg
@@ -337,6 +378,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6', // gray-100
     paddingVertical: 12, // py-3
+  },
+
+  // NEW STYLE: Header for Type Icon and Text
+  historyItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
 
   // History Item Type/Time: text-gray-900 font-bold / text-gray-600 text-sm

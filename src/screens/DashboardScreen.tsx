@@ -189,7 +189,7 @@ const DashboardScreen: React.FC<Props> = ({ navigation }) => {
             <CustomHeader navigation={navigation} /> 
             
             {/* Main Content Title */}
-            <Text style={styles.contentTitle}>Welcome Back!</Text>
+            <Text style={styles.contentTitle}>Welcome Parent!</Text>
             <Text style={styles.contentSubtitle}>Everything you need to care for your little one</Text>
             
             <FlatList

@@ -222,14 +222,7 @@ export default function TelehealthConsultationScreen() {
   // --- Scheduling/Listing View ---
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
-          <ChevronLeft size={24} color="#374151" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Telehealth Consultation</Text>
-        <Text style={styles.headerSubtitle}>Connect with pediatric specialists</Text>
-      </View>
-
+     
       <ScrollView contentContainerStyle={styles.scrollContent}>
         
         {/* Quick Consultation Section */}

@@ -309,17 +309,7 @@ const handleSaveReminder = async () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity 
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <ChevronLeft color="white" size={24} />
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>New Smart Reminder</Text>
-        </View>
-      </View>
+      
 
       <ScrollView style={styles.scrollViewContent} contentContainerStyle={styles.scrollViewPadding}>
         

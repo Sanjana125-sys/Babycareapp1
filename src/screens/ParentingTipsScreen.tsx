@@ -260,21 +260,7 @@ const ParentingTipsScreen = () => {
     return (
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
-          {/* Header (Kept original parenting style) */}
-          <View style={styles.header}>
-            <View style={styles.headerContent}>
-              <View>
-                <Text style={styles.headerTitle}>Parenting Tips</Text>
-                <Text style={styles.headerSubtitle}>Articles, videos & expert advice</Text>
-              </View>
-              <Baby size={32} color="white" />
-            </View>
-            
-            <Text style={styles.headerDescription}>
-              Age-based guidance, safety tips, and nutrition suggestions
-            </Text>
-          </View>
-
+          
           {/* Segmented Category Tabs: Replaced the ScrollView with the new component */}
           <SegmentedCategoryTabs
             categories={categories}

@@ -432,7 +432,7 @@ const AppointmentScreen: React.FC = () => {
         setSelectedDoctor(null);
         setIsConfirmationModalVisible(false);
         
-        Alert.alert("Success! 🎉", `Appointment successfully scheduled with Dr. ${details.doctor.name} on ${details.date} at ${details.time}.`);
+        Alert.alert("Success! ", `Appointment successfully scheduled with Dr. ${details.doctor.name} on ${details.date} at ${details.time}.`);
     };
 
     // 🌟 LOGIC TO FILTER APPOINTMENTS

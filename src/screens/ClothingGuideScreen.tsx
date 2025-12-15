@@ -268,15 +268,7 @@ const ClothingGuideScreen: React.FC = () => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => console.log('Go Back')}
-          style={styles.backButton}
-        >
-          <Icon name="ArrowLeft" size={20} style={{ color: '#6B7280' }} />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Clothing Guide</Text>
-      </View>
+      
 
       <View style={styles.tabBar}>
         <TouchableOpacity

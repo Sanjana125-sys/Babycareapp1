@@ -16,8 +16,7 @@ import { format, differenceInDays } from 'date-fns';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 // --- CHART LIBRARY IMPORT ---
 // Ensure you have 'react-native-chart-kit' installed: npm install react-native-chart-kit
-// We now explicitly import BarChart for the reports tab.
-import { LineChart, BarChart } from 'react-native-chart-kit'; 
+import { BarChart } from 'react-native-chart-kit'; 
 
 // --- TYPE DEFINITIONS & STATIC DATA ---
 interface Vaccination {
@@ -73,6 +72,9 @@ const initialVaccinations: Vaccination[] = [
 ];
 
 const screenWidth = Dimensions.get('window').width;
+// CRITICAL FIX: Define the chart width based on the screen, subtracting card padding (40) 
+// and an extra safe buffer (20) to prevent Expo Go overflow.
+const CHART_WIDTH = screenWidth - 80; 
 
 // --- CHART DATA GENERATION ---
 const generateChartData = (vaccines: Vaccination[]) => {
@@ -100,7 +102,6 @@ const chartConfig = {
     style: {
       borderRadius: 10,
     },
-    // Note: propsForDots is ignored by BarChart.
     propsForBackgroundLines: {
         strokeDasharray: '0' 
     }
@@ -201,17 +202,7 @@ const VaccinationTrackerScreen: React.FC = () => {
 
     const renderHeader = () => (
         <View style={styles.headerContainer}>
-            <View style={styles.headerTop}>
-                <TouchableOpacity onPress={() => {/* navigation back */}} style={styles.backButton} activeOpacity={0.7}>
-                    <Icon name="arrow-left" size={24} color="#FFF" />
-                </TouchableOpacity>
-                <View style={styles.headerTitleGroup}>
-                    <Text style={styles.headerTitle}>Vaccination Tracker</Text>
-                    <Text style={styles.headerSubtitle}>Manage your baby's immunizations</Text>
-                </View>
-                <Icon name="shield-half-full" size={24} color="#FFF" style={styles.shieldIcon} />
-            </View>
-
+            
             {/* Tab Navigation View */}
             <View style={styles.tabNavContainer}>
                 <TabButton tab="overview" current={activeTab} setTab={setActiveTab} label="Overview" />
@@ -377,15 +368,16 @@ const VaccinationTrackerScreen: React.FC = () => {
                 <Text style={styles.cardSubtitle}>Vaccination completion over time</Text>
                 
                 {/* --- BAR CHART INTEGRATION --- */}
-                <BarChart // <--- Using BarChart (histogram-like visualization for categories)
+                <BarChart
                     data={chartData}
-                    width={screenWidth - 40} // Card padding is 20 on each side
+                    // FIX: Using the predefined, buffered CHART_WIDTH to prevent overflow
+                    width={CHART_WIDTH} 
                     height={200}
                     chartConfig={chartConfig}
                     style={styles.chart}
-                    fromZero={true} // Ensures the chart starts from 0 for better bar representation
-                    yAxisLabel={''}       // Added to satisfy the type requirement
-                    yAxisSuffix={' V'}     // Example: Added ' V' for 'Vaccines' (or use '' if you want nothing)
+                    fromZero={true}
+                    yAxisLabel={''}
+                    yAxisSuffix={' V'}
                 />
                 {/* --- END BAR CHART --- */}
 
@@ -394,7 +386,7 @@ const VaccinationTrackerScreen: React.FC = () => {
             <View style={styles.card}>
                 <Text style={styles.cardTitle}>Monthly Vaccination Report</Text>
 
-                {/* Report Item 1 (Nov 25: 100%) */}
+                {/* Report Item 1 (Nov 25: 100%) - Mock Data */}
                 <View style={styles.reportItem}>
                     <Text style={styles.reportMonth}>Nov 25</Text>
                     <View style={styles.reportBarContainer}>
@@ -430,7 +422,6 @@ const VaccinationTrackerScreen: React.FC = () => {
             
             {renderHeader()}
             
-            {/* ScrollView fixed: using both style and contentContainerStyle defined below */}
             <ScrollView contentContainerStyle={styles.scrollContent} style={styles.scrollView}>
                 {activeTab === 'overview' && renderOverview()}
                 {activeTab === 'schedule' && renderSchedule()}
@@ -536,7 +527,7 @@ const styles = StyleSheet.create({
         color: '#E0F2F1', // Very light aqua
     },
     tabSection: {
-        marginTop: 20,
+        marginTop: 15,
     },
     card: {
         backgroundColor: '#FFFFFF',
@@ -777,6 +768,8 @@ const styles = StyleSheet.create({
     },
     chart: {
         marginVertical: 8,
+        // Small negative margin to correct possible default padding issues
+        marginHorizontal: -5, 
         borderRadius: 10,
         backgroundColor: '#FFF',
         shadowColor: '#000',

@@ -1,5 +1,3 @@
-// components/ActivityTab.tsx
-
 import React, { useState } from "react";
 import { 
   View, 
@@ -10,15 +8,24 @@ import {
   StyleSheet, 
   Alert 
 } from "react-native";
-import { Activity, Calendar, CheckCircle } from "lucide-react-native";
+import { 
+  Activity, 
+  Calendar, 
+  CheckCircle,
+  // --- New Icons for Activity Types ---
+  Soup,     // Tummy Time (representing the body/baby)
+  Footprints, // Walk
+  Waves,    // Massage (representing fluid motion/touch)
+  Shapes,      // Playtime
+} from "lucide-react-native";
 
 // --- Assuming ActivityLog type is imported or defined ---
 interface ActivityLog {
-    id: string;
-    time: Date;
-    durationMinutes: number;
-    type: string;
-    notes: string;
+    id: string;
+    time: Date;
+    durationMinutes: number;
+    type: string;
+    notes: string;
 }
 // ---------------------------------------------------
 
@@ -32,22 +39,24 @@ interface ActivityTabProps {
 
 export default function ActivityTab({ activityHistory, logActivity, formatDuration }: ActivityTabProps) {
   // Use a string state to capture user input for time
-  const [timeStr, setTimeStr] = useState(new Date().toLocaleString());
+  // Using toLocaleString() can lead to inconsistent parsing; for simplicity, we'll keep it for now, 
+  // but ideally, a DateTimePicker should be used here as well for reliability.
+  const [timeStr, setTimeStr] = useState(new Date().toLocaleString()); 
   const [type, setType] = useState(ACTIVITY_TYPES[1]);
   const [duration, setDuration] = useState("");
   const [notes, setNotes] = useState("");
   const [showTypeDropdown, setShowTypeDropdown] = useState(false);
 
   const handleLogActivity = () => {
-    // Attempt to parse the time string into a Date object
+    // Attempt to parse the time string into a Date object
     const parsedTime = new Date(timeStr);
     const durationMinutes = parseInt(duration, 10);
-    
-    // Validation check 1: Time parsing
-    if (isNaN(parsedTime.getTime())) {
-        Alert.alert("Error", "Invalid Time format. Please use a recognizable format (e.g., 'DD-MM-YYYY HH:MM:SS').");
-        return;
-    }
+    
+    // Validation check 1: Time parsing
+    if (isNaN(parsedTime.getTime())) {
+        Alert.alert("Error", "Invalid Time format. Please use a recognizable format (e.g., 'DD-MM-YYYY HH:MM:SS').");
+        return;
+    }
 
     // Validation check 2: Required fields
     if (!type || isNaN(durationMinutes) || durationMinutes <= 0) {
@@ -70,6 +79,23 @@ export default function ActivityTab({ activityHistory, logActivity, formatDurati
     setNotes("");
   };
 
+  // --- NEW HELPER FUNCTION FOR ICONS ---
+  const getActivityIcon = (type: string, size = 18) => {
+    switch (type) {
+      case "Tummy Time":
+        return <Soup size={size} color="#F59E0B" />; // Amber/Orange
+      case "Playtime":
+        return <Shapes size={size} color="#3B82F6" />; // Blue
+      case "Massage":
+        return <Waves size={size} color="#10B981" />; // Green/Emerald
+      case "Walk":
+        return <Footprints size={size} color="#8B5CF6" />; // Violet
+      default:
+        return null;
+    }
+  };
+
+
   return (
     <View style={styles.container}>
       {/* Log Activity Card */}
@@ -87,12 +113,12 @@ export default function ActivityTab({ activityHistory, logActivity, formatDurati
         >
           <Calendar size={18} color="#9CA3AF" />
           <TextInput
-                style={styles.timeInputText}
-                value={timeStr}
-                onChangeText={setTimeStr}
-                placeholder="Enter activity date and time"
-                placeholderTextColor="#9CA3AF"
-            />
+                style={styles.timeInputText}
+                value={timeStr}
+                onChangeText={setTimeStr}
+                placeholder="Enter activity date and time"
+                placeholderTextColor="#9CA3AF"
+            />
         </View>
 
         <View style={styles.row}>
@@ -100,9 +126,10 @@ export default function ActivityTab({ activityHistory, logActivity, formatDurati
           <View style={styles.typeDropdownWrapper}>
             <Text style={styles.label}>Type</Text>
             <TouchableOpacity 
-              style={styles.dropdownButton}
+              style={[styles.dropdownButton, styles.dropdownWithIcon]}
               onPress={() => setShowTypeDropdown(!showTypeDropdown)}
             >
+              {getActivityIcon(type, 18)}
               <Text style={styles.dropdownText}>{type}</Text>
             </TouchableOpacity>
             {showTypeDropdown && (
@@ -116,6 +143,7 @@ export default function ActivityTab({ activityHistory, logActivity, formatDurati
                     ]}
                     onPress={() => { setType(item); setShowTypeDropdown(false); }}
                   >
+                    {getActivityIcon(item, 16)}
                     <Text style={styles.dropdownText}>{item}</Text>
                     {type === item && <CheckCircle size={16} color="#06B6D4" />}
                   </TouchableOpacity>
@@ -163,13 +191,16 @@ export default function ActivityTab({ activityHistory, logActivity, formatDurati
         <ScrollView style={styles.historyScroll}>
           {activityHistory.map((log) => (
             <View key={log.id} style={styles.historyItem}>
-              <Text style={styles.historyItemType}>
-                {log.type}
-              </Text>
-              <Text style={styles.historyItemTime}>
+                <View style={styles.historyItemHeader}>
+                    {getActivityIcon(log.type, 18)}
+                    <Text style={[styles.historyItemType, { marginLeft: 8 }]}>
+                        {log.type}
+                    </Text>
+                </View>
+              <Text style={[styles.historyItemTime, { marginLeft: 26 }]}>
                 {log.time.toLocaleDateString()} {log.time.toLocaleTimeString()}
               </Text>
-              <Text style={styles.historyItemDuration}>
+              <Text style={[styles.historyItemDuration, { marginLeft: 26 }]}>
                 Duration: {formatDuration(log.durationMinutes)}
               </Text>
             </View>
@@ -180,7 +211,7 @@ export default function ActivityTab({ activityHistory, logActivity, formatDurati
   );
 }
 
-// --- StyleSheet Definitions (Renamed to 'styles' to match usage) ---
+// --- StyleSheet Definitions ---
 const styles = StyleSheet.create({
   // Equivalent to: px-4
   container: {
@@ -275,8 +306,13 @@ const styles = StyleSheet.create({
     padding: 12, // p-3
     backgroundColor: 'white',
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+  },
+
+  // NEW: Style for dropdown when an icon is present (justify-content changed)
+  dropdownWithIcon: {
+    justifyContent: 'flex-start',
+    gap: 8, 
   },
 
   // Dropdown Menu: absolute top-full w-full bg-white border border-gray-300 rounded-lg mt-1 shadow-lg
@@ -312,6 +348,7 @@ const styles = StyleSheet.create({
   // Dropdown/Input Text: text-gray-800
   dropdownText: {
     color: '#1f2937', // gray-800
+    marginLeft: 4, // Add margin to space from icon inside dropdown item
   },
 
   // Input common: border border-gray-300 rounded-lg p-3 bg-gray-50 text-gray-800
@@ -322,6 +359,7 @@ const styles = StyleSheet.create({
     padding: 12, // p-3
     backgroundColor: '#f9fafb', // gray-50
     color: '#1f2937', // gray-800
+    paddingVertical: 12, // Ensure consistent height with dropdown
   },
   
   // Notes Input: h-20 mb-4
@@ -363,6 +401,13 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#f3f4f6', // gray-100
     paddingVertical: 12, // py-3
+  },
+
+  // NEW: Header for Type Icon and Text
+  historyItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
   },
 
   // History Item Type: text-gray-900 font-bold

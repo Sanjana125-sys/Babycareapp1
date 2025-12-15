@@ -185,15 +185,7 @@ export default function PediatricianMapScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <TouchableOpacity onPress={() => router.back()}>
-            <Text style={styles.headerBackText}>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.headerTitle}>Find Pediatricians</Text>
-          <View style={{ width: 40 }} /> {/* Spacer */}
-        </View>
-      </View>
+      
 
       {/* Map Placeholder */}
       <MapPlaceholder />

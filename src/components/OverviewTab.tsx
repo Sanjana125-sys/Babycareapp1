@@ -1,17 +1,24 @@
-// components/OverviewTab.tsx
-
 import React from 'react';
 import { View, Text, Dimensions, StyleSheet } from 'react-native';
-import { Clock, Droplet, Activity } from 'lucide-react-native';
+import { 
+    Clock, 
+    Droplet, 
+    Activity, 
+    // --- NEW Imports for Recent History Icons ---
+    Moon,       // For Sleep
+    Baby,       // For Diaper/Baby Care
+    Waves,      // For Wet Diaper type
+    CloudRain,  // For Dirty Diaper type
+} from 'lucide-react-native';
 import { LineChart } from "react-native-chart-kit"; 
 import { TrackingHistory } from "../../src/types";
 
 // --- Type Definition for Chart Data (Optional but good practice) ---
 interface ChartData {
-    labels: string[];
-    datasets: {
-        data: number[];
-    }[];
+    labels: string[];
+    datasets: {
+        data: number[];
+    }[];
 }
 
 interface OverviewTabProps {
@@ -44,48 +51,62 @@ const chartConfig = {
 
 // --- Function to Prepare Dynamic Sleep Data ---
 /**
- * Processes sleep history to calculate total sleep duration per day 
- * for the last 7 days and formats it for the LineChart component.
- */
+ * Processes sleep history to calculate total sleep duration per day 
+ * for the last 7 days and formats it for the LineChart component.
+ */
 const prepareSleepTrendData = (sleepLogs: TrackingHistory['sleep'], numDays = 7): ChartData => {
-    const dailySleep: { [key: string]: number } = {};
-    const today = new Date();
+    const dailySleep: { [key: string]: number } = {};
+    const today = new Date();
 
-    // Initialize dailySleep object for the last numDays, setting sleep to 0
-    const dates: Date[] = [];
-    for (let i = numDays - 1; i >= 0; i--) {
-        const date = new Date(today);
-        date.setDate(today.getDate() - i);
-        dates.push(date);
-        dailySleep[date.toISOString().split('T')[0]] = 0;
-    }
+    // Initialize dailySleep object for the last numDays, setting sleep to 0
+    const dates: Date[] = [];
+    for (let i = numDays - 1; i >= 0; i--) {
+        const date = new Date(today);
+        date.setDate(today.getDate() - i);
+        dates.push(date);
+        dailySleep[date.toISOString().split('T')[0]] = 0;
+    }
 
-    // Populate dailySleep with actual data
-    sleepLogs.forEach(log => {
-        const dateKey = log.startTime.toISOString().split('T')[0];
-        if (dailySleep.hasOwnProperty(dateKey)) {
-            dailySleep[dateKey] += log.durationMinutes;
-        }
-    });
+    // Populate dailySleep with actual data
+    sleepLogs.forEach(log => {
+        const dateKey = log.startTime.toISOString().split('T')[0];
+        if (dailySleep.hasOwnProperty(dateKey)) {
+            dailySleep[dateKey] += log.durationMinutes;
+        }
+    });
 
-    // Format for the chart
-    const labels: string[] = [];
-    const data: number[] = [];
+    // Format for the chart
+    const labels: string[] = [];
+    const data: number[] = [];
 
-    dates.forEach(date => {
-        const dateKey = date.toISOString().split('T')[0];
-        // Labels: Use short day name (e.g., Mon, Tue)
-        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
-        // Data: Convert minutes to hours (to 1 decimal place)
-        data.push(parseFloat((dailySleep[dateKey] / 60).toFixed(1)));
-    });
+    dates.forEach(date => {
+        const dateKey = date.toISOString().split('T')[0];
+        // Labels: Use short day name (e.g., Mon, Tue)
+        labels.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+        // Data: Convert minutes to hours (to 1 decimal place)
+        data.push(parseFloat((dailySleep[dateKey] / 60).toFixed(1)));
+    });
 
-    return {
-        labels,
-        datasets: [{ data }],
-    };
+    return {
+        labels,
+        datasets: [{ data }],
+    };
 };
 // ----------------------------------------------------
+
+// --- Helper for Diaper Icon (NEW) ---
+const getDiaperIcon = (type: string, size: number) => {
+    switch (type) {
+        case 'Wet':
+            return <Waves size={size} color="#3B82F6" />; // Blue
+        case 'Dirty':
+            return <CloudRain size={size} color="#A16207" />; // Brown/Amber
+        case 'Both':
+            return <Baby size={size} color="#8B5CF6" />; // Violet (general baby icon for combination)
+        default:
+            return <Baby size={size} color="#9CA3AF" />; // Gray placeholder
+    }
+}
 
 
 // --- StatCard Component (Using defined Styles) ---
@@ -118,14 +139,14 @@ export default function OverviewTab({ history, formatDuration }: OverviewTabProp
     .filter(log => log.time.toISOString().startsWith(today))
     .reduce((sum, log) => sum + log.durationMinutes, 0);
 
-  // --- Generate Dynamic Data ---
-  const sleepTrendData = prepareSleepTrendData(history.sleep);
+  // --- Generate Dynamic Data ---
+  const sleepTrendData = prepareSleepTrendData(history.sleep);
 
-  // --- Get the most recent logs for summary cards ---
-  // Ensure history arrays are sorted by time descending (newest first) in the parent component
-  const recentSleep = history.sleep[0];
-  const recentDiaper = history.diaper[0];
-  const recentActivity = history.activity[0];
+  // --- Get the most recent logs for summary cards ---
+  // Assuming history arrays are sorted by time descending (newest first)
+  const recentSleep = history.sleep[0];
+  const recentDiaper = history.diaper[0];
+  const recentActivity = history.activity[0];
 
 
   return (
@@ -176,33 +197,42 @@ export default function OverviewTab({ history, formatDuration }: OverviewTabProp
             yAxisSuffix="h"
             yAxisInterval={1}
             // Optional: Add a check for data presence to avoid errors
-           hidePointsAtIndex={sleepTrendData.datasets[0].data.map((val, index) => val === 0 ? index : -1).filter(i => i !== -1)}
+           hidePointsAtIndex={sleepTrendData.datasets[0].data.map((val, index) => val === 0 ? index : -1).filter(i => i !== -1)}
         />
       </View>
       
       {/* Recent History */}
       <View style={styles.recentHistoryRow}>
-        {/* Recent Sleep */}
+        {/* Recent Sleep (UPDATED with Icon) */}
         <View style={[styles.recentCard, { width: (width - SPACING * 4) / 3 }]}>
-          <Text style={styles.recentTitle}>Recent Sleep</Text>
+            <View style={styles.recentTitleRow}>
+                <Moon size={16} color="#06B6D4" />
+                <Text style={[styles.recentTitle, { marginLeft: 4 }]}>Recent Sleep</Text>
+            </View>
           <Text style={styles.recentSubTextStrong}>{recentSleep?.type || 'N/A'}</Text>
           <Text style={styles.recentSubTextWeak}>
             {recentSleep?.startTime.toLocaleDateString() || ''} • {formatDuration(recentSleep?.durationMinutes || 0)}
           </Text>
         </View>
         
-        {/* Recent Diaper */}
+        {/* Recent Diaper (UPDATED with Icon Helper) */}
         <View style={[styles.recentCard, { width: (width - SPACING * 4) / 3 }]}>
-          <Text style={styles.recentTitle}>Recent Diaper</Text>
+            <View style={styles.recentTitleRow}>
+                {getDiaperIcon(recentDiaper?.type || '', 16)}
+                <Text style={[styles.recentTitle, { marginLeft: 4 }]}>Recent Diaper</Text>
+            </View>
           <Text style={styles.recentSubTextStrong}>{recentDiaper?.type || 'N/A'}</Text>
           <Text style={styles.recentSubTextWeak}>
             {recentDiaper?.time.toLocaleDateString() || ''}
           </Text>
         </View>
         
-        {/* Recent Activity */}
+        {/* Recent Activity (UPDATED with Icon) */}
         <View style={[styles.recentCard, { width: (width - SPACING * 4) / 3 }]}>
-          <Text style={styles.recentTitle}>Recent Activity</Text>
+            <View style={styles.recentTitleRow}>
+                <Activity size={16} color="#EF4444" />
+                <Text style={[styles.recentTitle, { marginLeft: 4 }]}>Recent Activity</Text>
+            </View>
           <Text style={styles.recentSubTextStrong}>{recentActivity?.type || 'N/A'}</Text>
           <Text style={styles.recentSubTextWeak}>
             {recentActivity?.time.toLocaleDateString() || ''} • {formatDuration(recentActivity?.durationMinutes || 0)}
@@ -214,7 +244,7 @@ export default function OverviewTab({ history, formatDuration }: OverviewTabProp
 }
 
 
-// --- StyleSheet Definitions ---
+// --- StyleSheet Definitions (UPDATED with new style) ---
 const styles = StyleSheet.create({
   // Equivalent to: px-4
   container: {
@@ -320,12 +350,18 @@ const styles = StyleSheet.create({
     borderColor: '#f3f4f6', // gray-100
   },
 
-  // Recent Title: text-gray-800 font-bold text-sm mb-1
+    // NEW: Style for icon and title alignment
+    recentTitleRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+
+  // Recent Title: text-gray-800 font-bold text-sm mb-1 (marginBottom is managed by recentTitleRow)
   recentTitle: {
     color: '#1f2937', // gray-800
     fontWeight: '700', // font-bold
     fontSize: 14, // text-sm
-    marginBottom: 4, // mb-1
   },
 
   // Recent SubText Strong: text-xs text-gray-600

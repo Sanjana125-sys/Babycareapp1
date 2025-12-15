@@ -133,12 +133,7 @@ export default function MilestoneScreen() {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Award color="white" size={24} />
-        <Text style={styles.headerTitle}>Baby Milestones</Text>
-        <Text style={styles.headerSubtitle}>Celebrate every developmental step!</Text>
-      </View>
-
+     
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {milestones.map(renderCategory)}
       </ScrollView>

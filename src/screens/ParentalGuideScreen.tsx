@@ -149,23 +149,7 @@ const ParentalGuideScreen: React.FC = () => {
       <View style={styles.mainContainer}>
         
         {/* Header */}
-        <View style={styles.headerBackground}>
-          <View style={styles.headerContent}>
-            <TouchableOpacity onPress={() => console.log('Go Back')} style={styles.backButton}>
-                <ArrowLeft size={24} color="white" />
-            </TouchableOpacity>
-
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.headerTitle}>Parental Guide</Text>
-              <Text style={styles.headerSubtitle}>Essential baby care techniques</Text>
-            </View>
-            <Baby size={32} color="white" />
-          </View>
-
-          <Text style={styles.headerInstructionText}>
-            Step-by-step instructions for caring for your little one
-          </Text>
-        </View>
+        
 
         {/* Tabs */}
         <View style={styles.tabContainer}>

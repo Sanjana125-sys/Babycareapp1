@@ -181,12 +181,7 @@ const LullabiesAndStoriesScreen: React.FC = () => {
 
     return (
         <SafeAreaView style={styles.safeArea}>
-            <View style={styles.header}>
-                <TouchableOpacity onPress={() => console.log("Go Back")} style={styles.backButton}>
-                    <Icon name="ArrowLeft" size={24} style={{ color: '#4F46E5' }} />
-                </TouchableOpacity>
-                <Text style={styles.headerTitle}>Lullabies & Stories</Text>
-            </View>
+            
 
             <ScrollView contentContainerStyle={styles.container}>
                 

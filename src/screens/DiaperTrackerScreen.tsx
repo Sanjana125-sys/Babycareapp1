@@ -28,7 +28,7 @@ import { LineChart } from 'react-native-chart-kit'; // For the combined screen
 interface DiaperEntry {
     id: string;
     timestamp: Date;
-    type: 'wet' | 'soiled' | 'mixed';
+    type: 'wet' | 'solid' | 'mixed';
     notes: string;
 }
 
@@ -43,7 +43,7 @@ const initialEntries: DiaperEntry[] = [
     {
         id: '2',
         timestamp: new Date(Date.now() - 7200000),
-        type: 'soiled',
+        type: 'solid',
         notes: 'Large bowel movement',
     },
     // Past entries (for chart)
@@ -62,7 +62,7 @@ const initialEntries: DiaperEntry[] = [
     {
         id: '5',
         timestamp: new Date(Date.now() - 172800000 - (72 * 3600000)), // 4 days ago
-        type: 'soiled',
+        type: 'solid',
         notes: 'Small amount',
     },
 ];
@@ -91,7 +91,7 @@ const getTypeStyles = (type: string) => {
             color: '#4A90E2', // Blue
             text: styles.wetText 
         };
-        case 'soiled': return { 
+        case 'solid': return { 
             bg: styles.soiledBg, 
             border: styles.soiledBorder, 
             color: '#FF7F50', // Coral/Amber
@@ -117,7 +117,7 @@ const getTypeIcon = (type: string) => {
 
     switch (type) {
         case 'wet': return <Droplets size={20} color={color} />;
-        case 'soiled': return <Wind size={20} color={color} />;
+        case 'solid': return <Wind size={20} color={color} />;
         case 'mixed': return (
             <View style={styles.mixedIconRow}>
                 <Droplets size={16} color="#4A90E2" />
@@ -131,7 +131,7 @@ const getTypeIcon = (type: string) => {
 const getTypeLabel = (type: string) => {
     switch (type) {
         case 'wet': return 'Wet';
-        case 'soiled': return 'Soiled';
+        case 'solid': return 'Solid';
         case 'mixed': return 'Mixed';
         default: return '';
     }
@@ -158,7 +158,7 @@ const getChartData = (entries: DiaperEntry[]) => {
         });
         
         wetData.push(dayEntries.filter(e => e.type === 'wet' || e.type === 'mixed').length);
-        soiledData.push(dayEntries.filter(e => e.type === 'soiled' || e.type === 'mixed').length);
+        soiledData.push(dayEntries.filter(e => e.type === 'solid' || e.type === 'mixed').length);
     }
     
     return {
@@ -175,7 +175,7 @@ const getChartData = (entries: DiaperEntry[]) => {
                 strokeWidth: 2
             }
         ],
-        legend: ['Wet Diapers', 'Soiled Diapers']
+        legend: ['Wet Diapers', 'Solid Diapers']
     };
 };
 
@@ -187,7 +187,7 @@ const DiaperTrackerScreen = () => {
     const [showDatePicker, setShowDatePicker] = useState(false);
     const [newEntry, setNewEntry] = useState({
         timestamp: new Date(),
-        type: 'wet' as 'wet' | 'soiled' | 'mixed',
+        type: 'wet' as 'wet' | 'solid' | 'mixed',
         notes: '',
     });
 
@@ -241,11 +241,11 @@ const DiaperTrackerScreen = () => {
     const todayEntries = entries.filter(e => e.timestamp.toDateString() === today.toDateString());
     
     const todayWet = todayEntries.filter(e => e.type === 'wet').length;
-    const todaySoiled = todayEntries.filter(e => e.type === 'soiled').length;
+    const todaySoiled = todayEntries.filter(e => e.type === 'solid').length;
     const todayMixed = todayEntries.filter(e => e.type === 'mixed').length;
 
     const totalWet = entries.filter(e => e.type === 'wet').length;
-    const totalSoiled = entries.filter(e => e.type === 'soiled').length;
+    const totalSoiled = entries.filter(e => e.type === 'solid').length;
     const totalMixed = entries.filter(e => e.type === 'mixed').length;
     
     const averagePerDay = (totalWet + totalSoiled + totalMixed) / 7;
@@ -254,16 +254,7 @@ const DiaperTrackerScreen = () => {
 
     return (
         <View style={styles.flex1}>
-            {/* Header */}
-            <View style={styles.header}>
-                <View style={styles.headerRow}>
-                    <TouchableOpacity onPress={() => router.back()} style={styles.p1}>
-                        <Text style={styles.backButtonText}>Back</Text>
-                    </TouchableOpacity>
-                    <Text style={styles.screenTitle}>Diaper Dashboard</Text>
-                    <View style={styles.spacer} />
-                </View>
-            </View>
+            
 
             <ScrollView style={styles.scrollViewContent}>
                 
@@ -295,7 +286,7 @@ const DiaperTrackerScreen = () => {
                     {/* Diaper Type Selection */}
                     <Text style={styles.inputLabel}>Diaper Type</Text>
                     <View style={styles.typeSelectionContainer}>
-                        {(['wet', 'soiled', 'mixed'] as const).map((type) => {
+                        {(['wet', 'solid', 'mixed'] as const).map((type) => {
                             const typeStyles = getTypeStyles(type);
                             const isSelected = newEntry.type === type;
 
@@ -359,7 +350,7 @@ const DiaperTrackerScreen = () => {
                         
                         <View style={styles.statItem}>
                             <Text style={styles.statValueAmber}>{todaySoiled}</Text>
-                            <Text style={styles.statLabel}>Soiled</Text>
+                            <Text style={styles.statLabel}>Solid</Text>
                         </View>
                         
                         <View style={styles.statItem}>
@@ -402,7 +393,7 @@ const DiaperTrackerScreen = () => {
                     
                     <View style={styles.statsRow}>
                         <StatCircle icon={<Droplets size={32} color="#4A90E2" />} count={totalWet} label="Wet" bgStyle={styles.wetBg} textStyle={styles.statValueBlue} />
-                        <StatCircle icon={<Wind size={32} color="#FF7F50" />} count={totalSoiled} label="Soiled" bgStyle={styles.soiledBg} textStyle={styles.statValueAmber} />
+                        <StatCircle icon={<Wind size={32} color="#FF7F50" />} count={totalSoiled} label="Solid" bgStyle={styles.soiledBg} textStyle={styles.statValueAmber} />
                         <StatCircle icon={<View style={styles.mixedIconRow}><Droplets size={20} color="#4A90E2" /><Wind size={20} color="#FF7F50" /></View>} count={totalMixed} label="Mixed" bgStyle={styles.mixedBg} textStyle={styles.statValuePurple} />
                     </View>
                     

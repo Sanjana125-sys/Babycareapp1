@@ -306,15 +306,7 @@ const CryAnalyzerScreen: React.FC = () => {
     return (
         <SafeAreaView style={styles.safeArea}>
             <ScrollView contentContainerStyle={styles.container} style={styles.scrollView}>
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        onPress={() => console.log("Go Back")}
-                        style={styles.backButton}
-                    >
-                        <Icon name="ArrowLeft" size={24} style={{ color: "#4B5563" }} />
-                    </TouchableOpacity>
-                    <Text style={styles.headerTitle}>Cry Analyzer</Text>
-                </View>
+                
 
                 <View style={styles.contentWrapper}>
 

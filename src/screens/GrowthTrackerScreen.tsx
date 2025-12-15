@@ -270,20 +270,7 @@ const GrowthTrackerScreen: React.FC<GrowthTrackerScreenProps> = ({ navigation })
 
     const renderHeader = () => (
         <View style={styles.headerContainer}>
-            <View style={styles.headerContent}>
-                <View style={styles.headerTitleGroup}>
-                    <TouchableOpacity onPress={() => navigation?.goBack()} style={styles.backButton}>
-                        <ChevronLeft size={24} color="#FFF" />
-                    </TouchableOpacity>
-                    <View style={styles.headerText}>
-                        <Text style={styles.headerTitle}>Growth Tracker</Text>
-                        <Text style={styles.headerSubtitle}>Monitor your baby's development</Text>
-                    </View>
-                </View>
-                <View style={styles.headerIconRight}>
-                    <Expand size={20} color="#FFF" />
-                </View>
-            </View>
+            
 
             {/* Tab Navigation - Updated with 'records' tab */}
             <View style={styles.tabNavContainer}>

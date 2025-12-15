@@ -175,7 +175,7 @@ const BabyProfileScreen: React.FC<Props> = ({ navigation }) => {
             const jsonValue = JSON.stringify(finalBabyData);
             await AsyncStorage.setItem(BABY_PROFILE_KEY, jsonValue);
             
-            Alert.alert("Success 🎉", "Baby profile saved successfully! (Data is persistent)");
+            Alert.alert("Success ", "Baby profile saved successfully! (Data is persistent)");
         } catch (e) {
             console.error("Failed to save baby profile to storage:", e);
             Alert.alert("Error", "Failed to save profile data.");

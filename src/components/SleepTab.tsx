@@ -1,5 +1,3 @@
-// components/SleepTab.tsx
-
 import React, { useState } from "react";
 import { 
   View, 
@@ -11,9 +9,20 @@ import {
   Alert 
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { Clock, Calendar, CheckCircle } from "lucide-react-native";
+import { 
+  Clock, 
+  Calendar, 
+  CheckCircle, 
+  // Icons for Sleep Type
+  Sun,       // Nap (Daytime)
+  Moon,      // Night Sleep
+  // Icons for Sleep Quality
+  Sparkles,  // Excellent
+  ThumbsUp,  // Good
+  Meh,       // Fair
+  Frown,     // Poor
+} from "lucide-react-native";
 // Removed: import AsyncStorage from '@react-native-async-storage/async-storage'; 
-// Rationale: AsyncStorage belongs in the parent screen (SleepTrackerScreen.tsx) for state persistence.
 
 import { SleepLog } from "../../src/types"; // Correct absolute path
 
@@ -22,7 +31,7 @@ const SLEEP_QUALITIES = ["Excellent", "Good", "Fair", "Poor"];
 
 interface SleepTabProps {
   sleepHistory: SleepLog[];
-  logSleep: (log: SleepLog) => void; // This function updates the state AND triggers AsyncStorage save in the parent
+  logSleep: (log: SleepLog) => void; 
   formatDuration: (minutes: number) => string;
 }
 
@@ -41,7 +50,6 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
 
     let durationMinutes = 0;
     if (endTime) {
-      // Calculate duration in minutes
       durationMinutes = Math.floor((endTime.getTime() - startTime.getTime()) / (1000 * 60));
     }
 
@@ -60,7 +68,6 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
       notes,
     };
     
-    // 💡 THE FIX: This correctly calls the parent function, which in turn saves the data.
     logSleep(newLog); 
 
     // Reset form
@@ -90,6 +97,34 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
       minute: '2-digit', 
       hour12: false // Force 24-hour format (e.g., 23:00)
     });
+  };
+
+  // --- NEW HELPER FUNCTIONS FOR ICONS ---
+
+  const getTypeIcon = (type: SleepLog["type"], size = 16, color = "#14b8a6") => {
+    switch (type) {
+      case "Nap":
+        return <Sun size={size} color={color} />; // Nap
+      case "Night Sleep":
+        return <Moon size={size} color={color} />; // Night Sleep
+      default:
+        return null;
+    }
+  };
+
+  const getQualityIcon = (quality: SleepLog["quality"], size = 16) => {
+    switch (quality) {
+      case "Excellent":
+        return <Sparkles size={size} color="#10B981" />; // Green (Emerald)
+      case "Good":
+        return <ThumbsUp size={size} color="#3B82F6" />; // Blue
+      case "Fair":
+        return <Meh size={size} color="#F59E0B" />; // Amber
+      case "Poor":
+        return <Frown size={size} color="#EF4444" />; // Red
+      default:
+        return null;
+    }
   };
 
   return (
@@ -134,6 +169,7 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
               style={styles.dropdownButton}
               onPress={() => { setShowTypeDropdown(!showTypeDropdown); setShowQualityDropdown(false); }}
             >
+              {getTypeIcon(type, 18, '#1f2937')}
               <Text style={styles.dropdownText}>{type}</Text>
             </TouchableOpacity>
             {showTypeDropdown && (
@@ -144,6 +180,7 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
                     style={[styles.dropdownItem, type === item && styles.dropdownItemActive]}
                     onPress={() => { setType(item as SleepLog["type"]); setShowTypeDropdown(false); }}
                   >
+                    {getTypeIcon(item as SleepLog["type"], 16, type === item ? "#06B6D4" : "#1f2937")}
                     <Text style={styles.dropdownText}>{item}</Text>
                     {type === item && <CheckCircle size={16} color="#06B6D4" />}
                   </TouchableOpacity>
@@ -159,6 +196,7 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
               style={styles.dropdownButton}
               onPress={() => { setShowQualityDropdown(!showQualityDropdown); setShowTypeDropdown(false); }}
             >
+              {getQualityIcon(quality, 18)}
               <Text style={styles.dropdownText}>{quality}</Text>
             </TouchableOpacity>
             {showQualityDropdown && (
@@ -169,6 +207,7 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
                     style={[styles.dropdownItem, quality === item && styles.dropdownItemActive]}
                     onPress={() => { setQuality(item as SleepLog["quality"]); setShowQualityDropdown(false); }}
                   >
+                    {getQualityIcon(item as SleepLog["quality"], 16)}
                     <Text style={styles.dropdownText}>{item}</Text>
                     {quality === item && <CheckCircle size={16} color="#06B6D4" />}
                   </TouchableOpacity>
@@ -213,17 +252,25 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
         <ScrollView style={styles.historyScroll}>
           {sleepHistory.map((log) => (
             <View key={log.id} style={styles.historyItem}>
-              <Text style={styles.historyItemType}>
-                {log.type}
-              </Text>
+              <View style={styles.historyItemHeader}>
+                {getTypeIcon(log.type, 18, '#111827')}
+                <Text style={[styles.historyItemType, { marginLeft: 8 }]}>
+                  {log.type}
+                </Text>
+              </View>
               <Text style={styles.historyItemTime}>
                 {log.startTime.toLocaleDateString()} {log.startTime.toLocaleTimeString()} 
                 {log.endTime ? ` - ${log.endTime.toLocaleTimeString()}` : ' (Ongoing)'}
               </Text>
               {log.endTime && (
-                  <Text style={styles.historyItemDetails}>
-                      Duration: {formatDuration(log.durationMinutes)} | Quality: {log.quality}
-                  </Text>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 4 }}>
+                    <Text style={styles.historyItemDetails}>
+                        Duration: {formatDuration(log.durationMinutes)} | Quality:
+                    </Text>
+                    <View style={{ marginLeft: 4 }}>
+                      {getQualityIcon(log.quality, 16)}
+                    </View>
+                  </View>
               )}
             </View>
           ))}
@@ -233,7 +280,7 @@ export default function SleepTab({ sleepHistory, logSleep, formatDuration }: Sle
   );
 }
 
-// --- StyleSheet Definitions (No changes needed) ---
+// --- StyleSheet Definitions ---
 const styles = StyleSheet.create({
   // Equivalent to: px-4
   container: {
@@ -327,7 +374,7 @@ const styles = StyleSheet.create({
     padding: 12, // p-3
     backgroundColor: 'white',
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around', // Changed to space-around for icon + text
     alignItems: 'center',
   },
 
@@ -353,7 +400,7 @@ const styles = StyleSheet.create({
     padding: 12, // p-3
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around', // Changed to space-around for icon + text + checkmark
   },
 
   // Dropdown Item Active: bg-indigo-50
@@ -364,6 +411,7 @@ const styles = StyleSheet.create({
   // Dropdown/Input Text: text-gray-800
   dropdownText: {
     color: '#1f2937', // gray-800
+    marginLeft: 4, // Added margin for spacing next to icon
   },
 
   // Input common: border border-gray-300 rounded-lg p-3 bg-gray-50 text-gray-800
@@ -416,6 +464,13 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f3f4f6', // gray-100
     paddingVertical: 12, // py-3
   },
+  
+  // NEW STYLE: Header for Type Icon and Text
+  historyItemHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
 
   // History Item Type: text-gray-900 font-bold
   historyItemType: {
@@ -427,10 +482,11 @@ const styles = StyleSheet.create({
   historyItemTime: {
     color: '#4b5563', // gray-600
     fontSize: 14, // text-sm
+    marginLeft: 26, // Align with the start of the time/details text
   },
   historyItemDetails: {
     color: '#4b5563', // gray-600
     fontSize: 14, // text-sm
-    marginTop: 2,
+    marginLeft: 26, // Align with the start of the time/details text
   }
 });
