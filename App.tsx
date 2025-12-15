@@ -31,7 +31,7 @@ import MilestoneScreen from './src/screens/MilestoneScreen';
 import DiaperTrackerScreen from './src/screens/DiaperTrackerScreen';
 import SleepingTrackerScreen from './src/screens/SleepingTrackerScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
-import ParentingTipsScreen from './src/screens/ParentingTipsScreen';
+
 
 /* ---------------- Types ---------------- */
 export type RootStackParamList = {
@@ -57,7 +57,7 @@ export type RootStackParamList = {
   DiaperTrackerScreen: undefined;
   SleepingTrackerScreen: undefined;
   SettingsScreen: undefined;
-  ParentingTipsScreen: undefined;
+  
 };
 
 type LoginProps = NativeStackScreenProps<
@@ -114,7 +114,7 @@ const AuthScreen = ({
           <Stack.Screen name="DiaperTrackerScreen" component={DiaperTrackerScreen} options={{ title: 'Diaper Tracker' }}/>
           <Stack.Screen name="SleepingTrackerScreen" component={SleepingTrackerScreen} options={{ title: 'Sleeping Tracker' }}/>
           <Stack.Screen name="SettingsScreen" component={SettingsScreen} options={{ title: 'Settings' }}/>
-          <Stack.Screen name="ParentingTipsScreen" component={ParentingTipsScreen} options={{ title: 'Parenting Tips' }}/>
+          
         </>
       ) : (
         <>
